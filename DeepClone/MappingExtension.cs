@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 
 namespace DeepClone
@@ -36,19 +35,8 @@ namespace DeepClone
                     continue;
                 }
 
-                if (IsValueType(fieldType))
-                {
-                    field.SetValue(source, value);
-                }
-                else if (IsDictionary(fieldType))
-                {
-                    ProcessDictionary(fieldType, (IDictionary)value);
-                }
-                else
-                {
-                    var deepCopy = DeepCopyInternal(fieldType, value);
-                    field.SetValue(source, deepCopy);
-                }
+                var copy = CopyInternal(fieldType, value);
+                field.SetValue(source, copy);
             }
         }
 
@@ -63,25 +51,37 @@ namespace DeepClone
                 {
                     continue;
                 }
-  
-                if (IsValueType(propType))
-                {
-                    prop.SetValue(source, value);
-                }
-                else if (IsDictionary(propType))
-                {
-                    var dictionaryCopy = ProcessDictionary(propType, (IDictionary)value);
-                    prop.SetValue(source, dictionaryCopy);
-                }
-                else
-                {
-                    var deepCopy = DeepCopyInternal(propType, value);
-                    prop.SetValue(source, deepCopy);
-                }
+
+                var copy = CopyInternal(propType, value);
+                prop.SetValue(source, copy);
             }
         }
 
-        private static IDictionary ProcessDictionary(Type dictionaryType, IDictionary templateValue)
+        private static object CopyInternal(Type type, object value)
+        {
+            object copy;
+            if (IsValueType(type))
+            {
+                copy = value;
+            }
+            else if (IsDictionary(type))
+            {
+                copy = CloneDictionary(type, (IDictionary)value);
+            }
+            else if (IsCollection(type))
+            {
+                copy = CloneCollection(type, (ICollection) value);
+            }
+            else
+            {
+                copy = CloneClass(type, value);
+            }
+
+            return copy;
+        }
+
+
+        private static IDictionary CloneDictionary(Type dictionaryType, IDictionary templateValue)
         {
             var genericArgs = dictionaryType.GetGenericArguments();
             var keyType = genericArgs[0];
@@ -90,8 +90,8 @@ namespace DeepClone
 
             foreach (var key in templateValue.Keys)
             {
-                var keyCopy = IsValueType(keyType) ? key : DeepCopyInternal(keyType, key);
-                var valueCopy = IsValueType(valueType) ? templateValue[key] : DeepCopyInternal(valueType, templateValue[key]);
+                var keyCopy = IsValueType(keyType) ? key : CloneClass(keyType, key);
+                var valueCopy = IsValueType(valueType) ? templateValue[key] : CloneClass(valueType, templateValue[key]);
 
                 dummy[keyCopy] = valueCopy;
             }
@@ -99,13 +99,26 @@ namespace DeepClone
             return dummy;
         }
 
-        private static T DeepCopyInternal<T>(Type memberType, T from)
+        private static ICollection CloneCollection(Type collectionType, ICollection collection)
+        {
+            var itemsType = collectionType.GetGenericArguments()[0];
+            var newCollection = (IList)Activator.CreateInstance(collectionType, collection.Count);
+
+            foreach (var item in collection)
+            {
+                var itemCopy = IsValueType(itemsType) ? item : CloneClass(itemsType, item);
+                newCollection.Add(itemCopy);
+            }
+            return newCollection;
+        }
+        
+        private static object CloneClass(Type memberType, object copyFrom)
         {
             var memberwiseClone = GetMemberwiseClone(memberType);
-            var cloneInstance = memberwiseClone.Invoke(from, null);
+            var cloneInstance = memberwiseClone.Invoke(copyFrom, null);
             var copyMethod = GetCopyMethod(memberType);
-            var deepCopy = copyMethod.Invoke(null, new[] {cloneInstance, from});
-            return (T) deepCopy;
+            var deepCopy = copyMethod.Invoke(null, new[] {cloneInstance, copyFrom});
+            return deepCopy;
         }
 
 
@@ -116,7 +129,12 @@ namespace DeepClone
 
         private static bool IsDictionary(Type type)
         {
-            return typeof(IDictionary).IsAssignableFrom(type);
+            return typeof(IDictionary<,>).IsAssignableFrom(type) || typeof(IDictionary).IsAssignableFrom(type);
+        }
+
+        private static bool IsCollection(Type type)
+        {
+            return typeof(ICollection<>).IsAssignableFrom(type) || typeof(ICollection).IsAssignableFrom(type);
         }
 
         private static MethodInfo GetMemberwiseClone(Type type)

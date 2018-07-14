@@ -130,5 +130,12 @@ namespace DeepClone.Test
 
             Assert.Equal(123, clone.ValueReference[1].FirstObjectField.IntProp);
         }
+        
+        [Fact]
+        public void CopyFrom_ListOfValues_Clones()
+        {
+            var classOfLists = new ClassWIthLists() {ListOfValues = new List<int>() {1, 2, 3, 4, 5}};
+            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+        }
     }
 }
