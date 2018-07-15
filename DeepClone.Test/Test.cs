@@ -97,7 +97,7 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_Dictionaries_Clones()
         {
-            var classOfDictionaries = new ClassWithDictionaries()
+            var classOfDictionaries = new ClassOfDictionaries()
             {
                 ValueValue = new Dictionary<int, int>() {{10, 1}, {11, 2}},
                 ValueReference = new Dictionary<int, ClassOfReferences>()
@@ -105,7 +105,7 @@ namespace DeepClone.Test
                     {1, new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {BoolProp = true}}}
                 }
             };
-            var clone = new ClassWithDictionaries().CopyFrom(classOfDictionaries);
+            var clone = new ClassOfDictionaries().CopyFrom(classOfDictionaries);
             
             Assert.Equal(1, clone.ValueValue[10]);
             Assert.Equal(2, clone.ValueValue[11]);
@@ -116,7 +116,7 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_Dictionaries_CanNotModifyOriginalValue()
         {
-            var classOfDictionaries = new ClassWithDictionaries()
+            var classOfDictionaries = new ClassOfDictionaries()
             {
                 ValueReference = new Dictionary<int, ClassOfReferences>()
                 {
@@ -124,7 +124,7 @@ namespace DeepClone.Test
                 }
             };
 
-            var clone = new ClassWithDictionaries().CopyFrom(classOfDictionaries);
+            var clone = new ClassOfDictionaries().CopyFrom(classOfDictionaries);
 
             classOfDictionaries.ValueReference[1].FirstObjectField.IntProp = 123456;
 
@@ -134,8 +134,8 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ListOfValues_Clones()
         {
-            var classOfLists = new ClassWIthLists() {ListOfValues = new List<int>() {1, 2, 3}};
-            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            var classOfLists = new ClassOfLists() {ListOfValues = new List<int>() {1, 2, 3}};
+            var copy = new ClassOfLists().CopyFrom(classOfLists);
 
             Assert.Equal(1, copy.ListOfValues[0]);
             Assert.Equal(2, copy.ListOfValues[1]);
@@ -145,7 +145,7 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ListOfReferences_Clones()
         {
-            var classOfLists = new ClassWIthLists()
+            var classOfLists = new ClassOfLists()
             {
                 ListOfReferenceses = new List<ClassOfReferences>()
                 {
@@ -153,7 +153,7 @@ namespace DeepClone.Test
                 }
             };
 
-            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            var copy = new ClassOfLists().CopyFrom(classOfLists);
 
             Assert.Equal(123, copy.ListOfReferenceses[0].FirstObjectProp.IntProp);
         }
@@ -161,14 +161,14 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ListOfReferences_CanNotModifyOriginal()
         {
-            var classOfLists = new ClassWIthLists()
+            var classOfLists = new ClassOfLists()
             {
                 ListOfReferenceses = new List<ClassOfReferences>()
                 {
                     new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {IntProp = 123}}
                 }
             };
-            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            var copy = new ClassOfLists().CopyFrom(classOfLists);
             classOfLists.ListOfReferenceses[0].FirstObjectProp.IntProp = 0;
 
             Assert.Equal(123, copy.ListOfReferenceses[0].FirstObjectProp.IntProp);
@@ -177,12 +177,12 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ArrayOfValues_Clones()
         {
-            var classOfLists = new ClassWIthLists()
+            var classOfLists = new ClassOfLists()
             {
                 ArrayOfValues = new[] {1, 2, 3}
             };
 
-            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            var copy = new ClassOfLists().CopyFrom(classOfLists);
 
             Assert.Equal(1, copy.ArrayOfValues[0]);
             Assert.Equal(2, copy.ArrayOfValues[1]);
@@ -192,12 +192,12 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ArrayOfReferences_CanNotModifyOriginal()
         {
-            var classOfLists = new ClassWIthLists()
+            var classOfLists = new ClassOfLists()
             {
                 ArrayOfReferenceses = new[]
                     {new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {IntProp = 100}}}
             };
-            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            var copy = new ClassOfLists().CopyFrom(classOfLists);
             classOfLists.ArrayOfReferenceses[0].FirstObjectProp.IntProp = 123;
 
             Assert.Equal(100, copy.ArrayOfReferenceses[0].FirstObjectProp.IntProp);

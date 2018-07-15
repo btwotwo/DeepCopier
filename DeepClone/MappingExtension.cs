@@ -16,14 +16,14 @@ namespace DeepClone
             var props = type.GetProperties();
             var fields = type.GetFields();
 
-            ProcessFields(fields, source, template);
-            ProcessProps(props, source, template);
+            CopyFields(fields, source, template);
+            CopyProps(props, source, template);
 
             return source;
         }
 
 
-        private static void ProcessFields<T>(IEnumerable<FieldInfo> fields, T source, T template)
+        private static void CopyFields<T>(IEnumerable<FieldInfo> fields, T source, T template)
         {
             foreach (var field in fields)
             {
@@ -41,7 +41,7 @@ namespace DeepClone
         }
 
 
-        private static void ProcessProps<T>(IEnumerable<PropertyInfo> props, T source, T template)
+        private static void CopyProps<T>(IEnumerable<PropertyInfo> props, T source, T template)
         {
             foreach (var prop in props)
             {
@@ -83,13 +83,12 @@ namespace DeepClone
 
         private static IDictionary CloneDictionary(Type dictionaryType, IDictionary templateValue)
         {
-            var genericArgs = dictionaryType.GetGenericArguments();
-            var keyType = genericArgs[0];
-            var valueType = genericArgs[1];
             var dummy = (IDictionary) Activator.CreateInstance(dictionaryType);
 
             foreach (var key in templateValue.Keys)
             {
+                var keyType = key.GetType();
+                var valueType = templateValue[key].GetType();
                 var keyCopy = IsValueType(keyType) ? key : CloneClass(keyType, key);
                 var valueCopy = IsValueType(valueType) ? templateValue[key] : CloneClass(valueType, templateValue[key]);
 

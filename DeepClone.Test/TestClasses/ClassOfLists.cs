@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DeepClone.Test.TestClasses
 {
-    public class ClassWIthLists
+    public class ClassOfLists
     {
         public List<int> ListOfValues { get; set; }
         public List<ClassOfReferences> ListOfReferenceses { get; set; }
@@ -13,3 +11,4 @@ namespace DeepClone.Test.TestClasses
         public ClassOfReferences[] ArrayOfReferenceses { get; set; }
     }
 }
+
