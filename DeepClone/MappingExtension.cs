@@ -68,9 +68,9 @@ namespace DeepClone
             {
                 copy = CloneDictionary(type, (IDictionary)value);
             }
-            else if (IsCollection(type))
+            else if (IsList(type))
             {
-                copy = CloneCollection(type, (ICollection) value);
+                copy = CloneList(type, (IList)value);
             }
             else
             {
@@ -99,17 +99,26 @@ namespace DeepClone
             return dummy;
         }
 
-        private static ICollection CloneCollection(Type collectionType, ICollection collection)
+        private static IList CloneList(Type listType, IList list)
         {
-            var itemsType = collectionType.GetGenericArguments()[0];
-            var newCollection = (IList)Activator.CreateInstance(collectionType, collection.Count);
+            var cloneList = (IList)Activator.CreateInstance(listType, list.Count);
 
-            foreach (var item in collection)
+            for (var i = 0; i < list.Count; i++)
             {
+                var item = list[i];
+                var itemsType = item.GetType();
                 var itemCopy = IsValueType(itemsType) ? item : CloneClass(itemsType, item);
-                newCollection.Add(itemCopy);
+
+                if (listType.IsArray)
+                {
+                    cloneList[i] = itemCopy;
+                }
+                else
+                {
+                    cloneList.Add(itemCopy);
+                }
             }
-            return newCollection;
+            return cloneList;
         }
         
         private static object CloneClass(Type memberType, object copyFrom)
@@ -129,12 +138,12 @@ namespace DeepClone
 
         private static bool IsDictionary(Type type)
         {
-            return typeof(IDictionary<,>).IsAssignableFrom(type) || typeof(IDictionary).IsAssignableFrom(type);
+            return typeof(IDictionary).IsAssignableFrom(type);
         }
 
-        private static bool IsCollection(Type type)
+        private static bool IsList(Type type)
         {
-            return typeof(ICollection<>).IsAssignableFrom(type) || typeof(ICollection).IsAssignableFrom(type);
+            return typeof(IList).IsAssignableFrom(type);
         }
 
         private static MethodInfo GetMemberwiseClone(Type type)

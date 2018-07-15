@@ -134,8 +134,73 @@ namespace DeepClone.Test
         [Fact]
         public void CopyFrom_ListOfValues_Clones()
         {
-            var classOfLists = new ClassWIthLists() {ListOfValues = new List<int>() {1, 2, 3, 4, 5}};
+            var classOfLists = new ClassWIthLists() {ListOfValues = new List<int>() {1, 2, 3}};
             var copy = new ClassWIthLists().CopyFrom(classOfLists);
+
+            Assert.Equal(1, copy.ListOfValues[0]);
+            Assert.Equal(2, copy.ListOfValues[1]);
+            Assert.Equal(3, copy.ListOfValues[2]);
+        }
+
+        [Fact]
+        public void CopyFrom_ListOfReferences_Clones()
+        {
+            var classOfLists = new ClassWIthLists()
+            {
+                ListOfReferenceses = new List<ClassOfReferences>()
+                {
+                    new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {IntProp = 123}}
+                }
+            };
+
+            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+
+            Assert.Equal(123, copy.ListOfReferenceses[0].FirstObjectProp.IntProp);
+        }
+
+        [Fact]
+        public void CopyFrom_ListOfReferences_CanNotModifyOriginal()
+        {
+            var classOfLists = new ClassWIthLists()
+            {
+                ListOfReferenceses = new List<ClassOfReferences>()
+                {
+                    new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {IntProp = 123}}
+                }
+            };
+            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            classOfLists.ListOfReferenceses[0].FirstObjectProp.IntProp = 0;
+
+            Assert.Equal(123, copy.ListOfReferenceses[0].FirstObjectProp.IntProp);
+        }
+
+        [Fact]
+        public void CopyFrom_ArrayOfValues_Clones()
+        {
+            var classOfLists = new ClassWIthLists()
+            {
+                ArrayOfValues = new[] {1, 2, 3}
+            };
+
+            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+
+            Assert.Equal(1, copy.ArrayOfValues[0]);
+            Assert.Equal(2, copy.ArrayOfValues[1]);
+            Assert.Equal(3, copy.ArrayOfValues[2]);
+        }
+
+        [Fact]
+        public void CopyFrom_ArrayOfReferences_CanNotModifyOriginal()
+        {
+            var classOfLists = new ClassWIthLists()
+            {
+                ArrayOfReferenceses = new[]
+                    {new ClassOfReferences() {FirstObjectProp = new ClassOfValues() {IntProp = 100}}}
+            };
+            var copy = new ClassWIthLists().CopyFrom(classOfLists);
+            classOfLists.ArrayOfReferenceses[0].FirstObjectProp.IntProp = 123;
+
+            Assert.Equal(100, copy.ArrayOfReferenceses[0].FirstObjectProp.IntProp);
         }
     }
 }
