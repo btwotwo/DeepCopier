@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
 namespace DeepClone
 {
     public static class MappingExtension
     {
+
         public static T CopyFrom<T>(this T source, T template)
         {
             // I could use MemberwiseClone, but i'd lost reference to source, so here is a workaround
             var type = typeof(T);
-
-            var props = type.GetProperties();
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var props = type.GetProperties(bindingFlags);
+            var fields = type.GetFields(bindingFlags);
 
             CopyProps(props, source, template);
             CopyFields(fields, source, template);

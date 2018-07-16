@@ -24,6 +24,16 @@ namespace DeepClone.Test.TestClasses
 
         public string StringProp { get; set; }
 
+        private int PrivateProp { get; set; }
 
+        public int GetPrivateProp()
+        {
+            return PrivateProp;
+        }
+
+        public void SetPrivateProp(int value)
+        {
+            PrivateProp = value;
+        }
     }
 }
