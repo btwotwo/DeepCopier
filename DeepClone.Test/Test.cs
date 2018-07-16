@@ -202,5 +202,24 @@ namespace DeepClone.Test
 
             Assert.Equal(100, copy.ArrayOfReferenceses[0].FirstObjectProp.IntProp);
         }
+
+        [Fact]
+        public void CopyFrom_PrivateValueField_Clones()
+        {
+            var classOfValues = new ClassOfValues() {PrivateFieldProp = 2};
+            var copy = new ClassOfValues().CopyFrom(classOfValues);
+
+            Assert.Equal(4, copy.PrivateFieldProp);
+        }
+
+        [Fact]
+        public void CopyFrom_PrivateReferenceField_Clones()
+        {
+            var classOfReferences =
+                new ClassOfReferences() {PrivateFieldProp = new ClassOfValues() {PrivateFieldProp = 4}};
+            var copy = new ClassOfReferences().CopyFrom(classOfReferences);
+
+            Assert.Equal(10, copy.PrivateFieldProp.PrivateFieldProp);
+        }
     }
 }

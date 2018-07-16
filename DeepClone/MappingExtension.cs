@@ -14,10 +14,10 @@ namespace DeepClone
             var type = typeof(T);
 
             var props = type.GetProperties();
-            var fields = type.GetFields();
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            CopyFields(fields, source, template);
             CopyProps(props, source, template);
+            CopyFields(fields, source, template);
 
             return source;
         }
