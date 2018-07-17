@@ -10,7 +10,7 @@ namespace DeepClone
 
         public static T CopyFrom<T>(this T source, T template)
         {
-            // I could use MemberwiseClone, but i'd lost reference to source, so here is a workaround
+            // I could use MemberwiseClone, but then i'd lost reference to source
             var type = typeof(T);
             var bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             var props = type.GetProperties(bindingFlags);
@@ -132,7 +132,7 @@ namespace DeepClone
 
         private static bool IsValueType(Type type)
         {
-            return type.IsValueType || type.IsAssignableFrom(typeof(string)); //string behaves like it's a value type, so whatever
+            return type.IsValueType || type.IsAssignableFrom(typeof(string)); //string behaves like it's a value type
         }
 
         private static bool IsDictionary(Type type)
