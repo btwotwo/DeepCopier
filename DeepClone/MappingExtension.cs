@@ -45,9 +45,13 @@ namespace DeepClone
         {
             foreach (var prop in props)
             {
+                if (prop.GetMethod == null)
+                {
+                    continue;
+                }
                 var propType = prop.PropertyType;
                 var value = prop.GetValue(template);
-                if (value == null || propType.IsAbstract || prop.GetSetMethod() == null)
+                if (value == null || propType.IsAbstract || prop.SetMethod == null)
                 {
                     continue;
                 }
